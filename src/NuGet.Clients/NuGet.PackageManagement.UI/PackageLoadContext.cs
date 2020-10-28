@@ -78,7 +78,7 @@ namespace NuGet.PackageManagement.UI
                     var targetFrameworks = await project.GetTargetFrameworksAsync(ServiceBroker, CancellationToken.None);
                     foreach (var targetFramework in targetFrameworks)
                     {
-                        frameworks.Add(targetFramework.DotNetFrameworkName);
+                        frameworks.Add(targetFramework.ToString());
                     }
                 }
                 else
@@ -99,7 +99,7 @@ namespace NuGet.PackageManagement.UI
 
                         if (framework.IsSpecificFramework)
                         {
-                            frameworks.Add(framework.DotNetFrameworkName);
+                            frameworks.Add(framework.ToString());
                         }
                     }
                     else
@@ -116,7 +116,7 @@ namespace NuGet.PackageManagement.UI
                                     return new List<string>();
                                 }
 
-                                frameworks.Add(f.DotNetFrameworkName);
+                                frameworks.Add(f.ToString());
                             }
                         }
                     }
