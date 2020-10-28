@@ -1130,7 +1130,7 @@ namespace NuGet.PackageManagement.VisualStudio.Test
         }
 
         [Fact]
-        public async Task GetTransitivePackagesAsync_WithAssetsFile_ReturnsTransitivePackageReferences()
+        public async Task GetTransitivePackagesAsync_WithTransitivePackageReferences_ReturnsPackageIdentities()
         {
             using (var testDirectory = TestDirectory.Create())
             {
@@ -1184,7 +1184,7 @@ namespace NuGet.PackageManagement.VisualStudio.Test
         }
 
         [Fact]
-        public async Task GetTransitivePackagesAsync_WithAssetsFile_ReturnsNestedTransitivePackageReferences()
+        public async Task GetTransitivePackagesAsync_WithNestedTransitivePackageReferences_ReturnsPackageIdentities()
         {
             using (var testDirectory = TestDirectory.Create())
             {
@@ -1248,7 +1248,7 @@ namespace NuGet.PackageManagement.VisualStudio.Test
         }
 
         [Fact]
-        public async Task GetTransitivePackagesAsync_WithAssetsFile_NoTransitivePackageReferences()
+        public async Task GetTransitivePackagesAsync_WithNoTransitivePackageReferences_ReturnsOnlyInstalledPackageIdentities()
         {
             using (var testDirectory = TestDirectory.Create())
             {
