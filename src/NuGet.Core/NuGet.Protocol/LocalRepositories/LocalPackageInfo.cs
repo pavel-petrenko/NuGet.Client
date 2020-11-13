@@ -22,18 +22,18 @@ namespace NuGet.Protocol
             // TODO: becompat.    
         }
 
-            /// <summary>
-            /// Local nuget package.
-            /// </summary>
-            /// <param name="identity">Package id and version.</param>
-            /// <param name="path">Path to the nupkg.</param>
-            /// <param name="lastWriteTimeUtc">Last nupkg write time for publish date.</param>
-            /// <param name="nuspec">Nuspec XML.</param>
-            public LocalPackageInfo(
-            PackageIdentity identity,
-            string path,
-            DateTime lastWriteTimeUtc,
-            Lazy<NuspecReader> nuspec)
+        /// <summary>
+        /// Local nuget package.
+        /// </summary>
+        /// <param name="identity">Package id and version.</param>
+        /// <param name="path">Path to the nupkg.</param>
+        /// <param name="lastWriteTimeUtc">Last nupkg write time for publish date.</param>
+        /// <param name="nuspec">Nuspec XML.</param>
+        public LocalPackageInfo(
+        PackageIdentity identity,
+        string path,
+        DateTime lastWriteTimeUtc,
+        Lazy<NuspecReader> nuspec)
         {
             if (identity == null)
             {

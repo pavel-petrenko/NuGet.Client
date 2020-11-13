@@ -30,7 +30,7 @@ namespace NuGet.PackageManagement.UI.Test
         private readonly ITestOutputHelper _output;
         private readonly INuGetRemoteFileService _remoteFileService;
         private Mock<IServiceBroker> _serviceBroker = new Mock<IServiceBroker>();
-		
+
         public PackageItemListViewModelTests(
             GlobalServiceProvider globalServiceProvider,
             ITestOutputHelper output,

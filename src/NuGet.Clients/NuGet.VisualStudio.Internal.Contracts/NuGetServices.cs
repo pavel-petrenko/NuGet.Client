@@ -21,7 +21,7 @@ namespace NuGet.VisualStudio.Internal.Contracts
         private const string ProjectUpgraderServiceVersion = "1.0.0";
         private const string RemoteFileServiceName = "Microsoft.VisualStudio.NuGet.RemoteFileService";
         private const string RemoteFileServiceVersion = "1.0.0";
-		private const string SearchServiceName = "Microsoft.VisualStudio.NuGet.PackageSearchService";
+        private const string SearchServiceName = "Microsoft.VisualStudio.NuGet.PackageSearchService";
         private const string SearchServiceVersion = "1.0.0";
 
         public static readonly ServiceRpcDescriptor SolutionService = new ServiceJsonRpcDescriptor(

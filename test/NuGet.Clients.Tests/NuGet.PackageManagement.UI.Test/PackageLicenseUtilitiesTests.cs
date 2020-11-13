@@ -148,7 +148,7 @@ namespace NuGet.PackageManagement.UI.Test
             var licenseFileLocation = "License.txt";
             var licenseFileHeader = "header";
             var licenseData = new LicenseMetadata(LicenseType.File, licenseFileLocation, null, null, LicenseMetadata.CurrentVersion);
-           //TODO:  var licenseContent = "License content";
+            //TODO:  var licenseContent = "License content";
 
             // Act
             var links = PackageLicenseUtilities.GenerateLicenseLinks(
