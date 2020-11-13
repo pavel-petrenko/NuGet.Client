@@ -6,9 +6,6 @@
 using System;
 using System.Diagnostics;
 using System.IO;
-using System.IO.Compression;
-using System.Linq;
-using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -16,7 +13,6 @@ using Microsoft;
 using Microsoft.ServiceHub.Framework;
 using Microsoft.ServiceHub.Framework.Services;
 using NuGet.Common;
-using NuGet.PackageManagement.UI;
 using NuGet.Packaging;
 using NuGet.VisualStudio.Internal.Contracts;
 
@@ -27,6 +23,7 @@ namespace NuGet.PackageManagement.VisualStudio
         private ServiceActivationOptions? _options;
         private IServiceBroker _serviceBroker;
         private AuthorizationServiceClient? _authorizationServiceClient;
+        private bool _disposedValue;
 
         public NuGetRemoteFileService(
             ServiceActivationOptions options,
@@ -46,7 +43,7 @@ namespace NuGet.PackageManagement.VisualStudio
             _serviceBroker = serviceBroker;
             Assumes.NotNull(_serviceBroker);
         }
-        public async ValueTask<(Stream?, IconBitmapStatus)> GetRemoteFileAsync(Uri uri, CancellationToken cancellationToken)
+        public async ValueTask<Stream?> GetRemoteFileAsync(Uri uri, CancellationToken cancellationToken)
         {
             if (IsEmbeddedUri(uri))
             {
@@ -63,7 +60,7 @@ namespace NuGet.PackageManagement.VisualStudio
                     if (File.Exists(extractedIconPath))
                     {
                         Stream fileStream = new FileStream(extractedIconPath, FileMode.Open);
-                        return (fileStream, IconBitmapStatus.EmbeddedIcon);
+                        return fileStream;
                     }
                     else
                     {
@@ -74,25 +71,25 @@ namespace NuGet.PackageManagement.VisualStudio
                             {
                                 var memoryStream = new MemoryStream();
                                 await parStream.CopyToAsync(memoryStream);
-                                return (memoryStream, IconBitmapStatus.EmbeddedIcon);
+                                return memoryStream;
                             }
                         }
                         catch (Exception ex)
                         {
                             Debug.WriteLine(ex);
-                            return (null, IconBitmapStatus.DefaultIconDueToNullStream);
+                            return null;
                         }
                     }
                 }
                 else
                 {
-                    return (null, IconBitmapStatus.DefaultIconDueToNullStream);
+                    return null;
                 }
             }
             else
             {
                 Stream? stream = await GetStream(uri);
-                return (stream, stream == null ? IconBitmapStatus.DefaultIconDueToNullStream : IconBitmapStatus.DownloadedIcon);
+                return stream;
             }
         }
 
