@@ -35,7 +35,7 @@ namespace NuGet.VisualStudio.Internal.Contracts
         public long? DownloadCount { get; internal set; }
         public IReadOnlyCollection<PackageDependencyGroup>? DependencySets { get; internal set; }
         public LicenseMetadata? LicenseMetadata { get; internal set; }
-        public PackageReaderBase? PackageReader { get; internal set; }
+        public string? PackagePath { get; internal set; }
         public IReadOnlyCollection<PackageVulnerabilityMetadataContextInfo>? Vulnerabilities { get; internal set; }
 
         public static PackageSearchMetadataContextInfo Create(IPackageSearchMetadata packageSearchMetadata)

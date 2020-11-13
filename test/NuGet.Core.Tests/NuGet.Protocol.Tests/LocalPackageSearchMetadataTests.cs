@@ -27,8 +27,8 @@ namespace NuGet.Protocol.Tests
                 new PackageIdentity("id", NuGetVersion.Parse("1.0.0")),
                 "path",
                 new DateTime(2019, 8, 19),
-                new Lazy<NuspecReader>(() => null),
-                () => null);
+                new Lazy<NuspecReader>(() => null)
+                );
 
             var localPackageSearchMetadata = new LocalPackageSearchMetadata(localPackageInfo);
 

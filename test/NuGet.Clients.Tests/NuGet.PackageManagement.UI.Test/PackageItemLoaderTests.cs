@@ -83,6 +83,7 @@ namespace NuGet.PackageManagement.UI.Test
                 new List<PackageSourceContextInfo> { source1, source2 },
                 NuGet.VisualStudio.Internal.Contracts.ItemFilter.All,
                 searchService.Object,
+                remoteFileService: null,
                 TestSearchTerm);
 
             await loader.LoadNextAsync(null, CancellationToken.None);
@@ -97,8 +98,8 @@ namespace NuGet.PackageManagement.UI.Test
             }
         }
 
-        [Fact(Skip = "Pending https://github.com/NuGet/Home/issues/10151")]
-        public async Task PackageReader_NotNull()
+        [Fact]
+        public async Task PackagePath_NotNull()
         {
             // Prepare
             var solutionManager = Mock.Of<INuGetSolutionManagerService>();
@@ -158,6 +159,7 @@ namespace NuGet.PackageManagement.UI.Test
                     new List<PackageSourceContextInfo> { PackageSourceContextInfo.Create(localSource) },
                     NuGet.VisualStudio.Internal.Contracts.ItemFilter.All,
                     searchService.Object,
+                    remoteFileService: null,
                     TestSearchTerm);
 
                 // Act
@@ -166,7 +168,7 @@ namespace NuGet.PackageManagement.UI.Test
 
                 // Assert
                 Assert.Single(results);
-                Assert.NotNull(results.First().PackageReader);
+                Assert.NotNull(results.First().PackagePath);
             }
         }
     }

@@ -40,8 +40,7 @@ namespace NuGet.Test.Utility
                 {
                     var reader = new PackageArchiveReader(pkgPath);
                     return reader.NuspecReader;
-                }),
-                getPackageReader: () => new PackageArchiveReader(pkgPath));
+                }));
             TestData = new LocalPackageSearchMetadata(info);
         }
 

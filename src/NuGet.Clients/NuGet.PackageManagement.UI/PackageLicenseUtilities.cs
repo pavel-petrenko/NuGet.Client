@@ -16,23 +16,23 @@ namespace NuGet.PackageManagement.UI
     {
         internal static IReadOnlyList<IText> GenerateLicenseLinks(DetailedPackageMetadata metadata)
         {
-            return GenerateLicenseLinks(metadata.LicenseMetadata, metadata.LicenseUrl, string.Format(CultureInfo.CurrentCulture, Resources.WindowTitle_LicenseFileWindow, metadata.Id), metadata.LoadFileAsText);
+            return GenerateLicenseLinks(metadata.LicenseMetadata, metadata.LicenseUrl, string.Format(CultureInfo.CurrentCulture, Resources.WindowTitle_LicenseFileWindow, metadata.Id), metadata.PackagePath);
         }
 
         internal static IReadOnlyList<IText> GenerateLicenseLinks(IPackageSearchMetadata metadata)
         {
             if (metadata is LocalPackageSearchMetadata localMetadata)
             {
-                return GenerateLicenseLinks(metadata.LicenseMetadata, metadata.LicenseUrl, string.Format(CultureInfo.CurrentCulture, Resources.WindowTitle_LicenseFileWindow, metadata.Identity.Id), localMetadata.LoadFileAsText);
+                return GenerateLicenseLinks(metadata.LicenseMetadata, metadata.LicenseUrl, string.Format(CultureInfo.CurrentCulture, Resources.WindowTitle_LicenseFileWindow, metadata.Identity.Id), localMetadata.PackagePath);
             }
             return GenerateLicenseLinks(metadata.LicenseMetadata, metadata.LicenseUrl, metadata.Identity.Id, null);
         }
 
-        internal static IReadOnlyList<IText> GenerateLicenseLinks(LicenseMetadata licenseMetadata, Uri licenseUrl, string licenseFileHeader, Func<string, string> loadFile)
+        internal static IReadOnlyList<IText> GenerateLicenseLinks(LicenseMetadata licenseMetadata, Uri licenseUrl, string licenseFileHeader, string packagePath)
         {
             if (licenseMetadata != null)
             {
-                return GenerateLicenseLinks(licenseMetadata, licenseFileHeader, loadFile);
+                return GenerateLicenseLinks(licenseMetadata, licenseFileHeader, packagePath);
             }
             else if (licenseUrl != null)
             {
@@ -56,7 +56,7 @@ namespace NuGet.PackageManagement.UI
         }
 
         // Internal for testing purposes.
-        internal static IReadOnlyList<IText> GenerateLicenseLinks(LicenseMetadata metadata, string licenseFileHeader, Func<string, string> loadFile)
+        internal static IReadOnlyList<IText> GenerateLicenseLinks(LicenseMetadata metadata, string licenseFileHeader, string packagePath)
         {
             var list = new List<IText>();
 
@@ -78,7 +78,7 @@ namespace NuGet.PackageManagement.UI
 
                         foreach (var identifier in identifiers)
                         {
-                            var licenseStart = licenseToBeProcessed.IndexOf(identifier);
+                            var licenseStart = licenseToBeProcessed.IndexOf(identifier, StringComparison.OrdinalIgnoreCase);
                             if (licenseStart != 0)
                             {
                                 list.Add(new FreeText(licenseToBeProcessed.Substring(0, licenseStart)));
@@ -101,7 +101,7 @@ namespace NuGet.PackageManagement.UI
                     break;
 
                 case LicenseType.File:
-                    list.Add(new LicenseFileText(Resources.Text_ViewLicense, licenseFileHeader, loadFile, metadata.License));
+                    list.Add(new LicenseFileText(Resources.Text_ViewLicense, licenseFileHeader, packagePath, metadata.License));
                     break;
 
                 default:

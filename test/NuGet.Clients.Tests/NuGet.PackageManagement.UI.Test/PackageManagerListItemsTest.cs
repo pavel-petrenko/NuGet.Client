@@ -53,6 +53,7 @@ namespace NuGet.PackageManagement.UI.Test
                 new List<PackageSourceContextInfo> { PackageSourceContextInfo.Create(repo.PackageSource) },
                 NuGet.VisualStudio.Internal.Contracts.ItemFilter.All,
                 searchService,
+                remoteFileService: null,
                 "EntityFramework",
                 includePrerelease: false);
 
@@ -119,6 +120,7 @@ namespace NuGet.PackageManagement.UI.Test
                 },
                 NuGet.VisualStudio.Internal.Contracts.ItemFilter.All,
                 searchService,
+                remoteFileService: null,
                 "EntityFramework",
                 includePrerelease: false);
 

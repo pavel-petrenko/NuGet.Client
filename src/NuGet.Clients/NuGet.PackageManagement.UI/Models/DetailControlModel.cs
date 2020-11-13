@@ -128,7 +128,7 @@ namespace NuGet.PackageManagement.UI
             _searchResultPackage = searchResultPackage;
             _filter = filter;
             OnPropertyChanged(nameof(Id));
-            OnPropertyChanged(nameof(PackageReader));
+            OnPropertyChanged(nameof(PackagePath));
             OnPropertyChanged(nameof(IconUrl));
             OnPropertyChanged(nameof(IconBitmap));
             OnPropertyChanged(nameof(PrefixReserved));
@@ -703,7 +703,7 @@ namespace NuGet.PackageManagement.UI
 
         public IEnumerable<IProjectContextInfo> NuGetProjects => _nugetProjects;
 
-        public Func<PackageReaderBase> PackageReader => _searchResultPackage?.PackageReader;
+        public string PackagePath => _searchResultPackage?.PackagePath;
 
         protected void AddBlockedVersions(NuGetVersion[] blockedVersions)
         {

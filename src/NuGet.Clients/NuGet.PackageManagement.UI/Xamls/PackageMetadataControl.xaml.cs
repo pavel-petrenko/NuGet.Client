@@ -3,12 +3,17 @@
 
 using System;
 using System.Globalization;
+using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
+using Microsoft.ServiceHub.Framework;
 using Microsoft.VisualStudio.Threading;
 using NuGet.VisualStudio;
+using NuGet.VisualStudio.Common;
+using NuGet.VisualStudio.Internal.Contracts;
 
 namespace NuGet.PackageManagement.UI
 {
@@ -42,7 +47,22 @@ namespace NuGet.PackageManagement.UI
 
                 NuGetUIThreadHelper.JoinableTaskFactory.RunAsync(async () =>
                 {
-                    var content = metadata.LoadFileAsText(metadata.LicenseMetadata.License);
+                    IServiceBrokerProvider serviceBrokerProvider = await ServiceLocator.GetInstanceAsync<IServiceBrokerProvider>();
+                    IServiceBroker serviceBroker = await serviceBrokerProvider.GetAsync();
+
+                    //TODO: should we make this service idisposable?
+#pragma warning disable ISB001 // Dispose of proxies
+                    INuGetRemoteFileService remoteFileService = await serviceBroker.GetProxyAsync<INuGetRemoteFileService>(NuGetServices.RemoteFileService);
+#pragma warning restore ISB001 // Dispose of proxies
+
+                    Stream stream = await remoteFileService.GetRemoteFileAsync(new Uri(metadata.PackagePath + "#" + metadata.LicenseMetadata.License), CancellationToken.None);
+                    string content = null;
+                    if (stream != null)
+                    {
+                        StreamReader reader = new StreamReader(stream);
+                        content = reader.ReadToEnd();
+                    }
+
                     var flowDoc = new FlowDocument();
                     flowDoc.Blocks.AddRange(PackageLicenseUtilities.GenerateParagraphs(content));
                     await NuGetUIThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();

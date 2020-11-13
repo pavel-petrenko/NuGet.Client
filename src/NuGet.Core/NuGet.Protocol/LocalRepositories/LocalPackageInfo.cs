@@ -10,22 +10,30 @@ namespace NuGet.Protocol
     public class LocalPackageInfo
     {
         private readonly Lazy<NuspecReader> _nuspecHelper;
-        private readonly Func<PackageReaderBase> _getPackageReader;
 
-        /// <summary>
-        /// Local nuget package.
-        /// </summary>
-        /// <param name="identity">Package id and version.</param>
-        /// <param name="path">Path to the nupkg.</param>
-        /// <param name="lastWriteTimeUtc">Last nupkg write time for publish date.</param>
-        /// <param name="nuspec">Nuspec XML.</param>
-        /// <param name="getPackageReader">Method to retrieve the package as a reader.</param>
+        [Obsolete("Please move to ")]
         public LocalPackageInfo(
             PackageIdentity identity,
             string path,
             DateTime lastWriteTimeUtc,
             Lazy<NuspecReader> nuspec,
-            Func<PackageReaderBase> getPackageReader)
+            Func<PackageReaderBase> getPackageReader) : this(identity, path, lastWriteTimeUtc, nuspec)
+        {
+            // TODO: becompat.    
+        }
+
+            /// <summary>
+            /// Local nuget package.
+            /// </summary>
+            /// <param name="identity">Package id and version.</param>
+            /// <param name="path">Path to the nupkg.</param>
+            /// <param name="lastWriteTimeUtc">Last nupkg write time for publish date.</param>
+            /// <param name="nuspec">Nuspec XML.</param>
+            public LocalPackageInfo(
+            PackageIdentity identity,
+            string path,
+            DateTime lastWriteTimeUtc,
+            Lazy<NuspecReader> nuspec)
         {
             if (identity == null)
             {
@@ -42,16 +50,10 @@ namespace NuGet.Protocol
                 throw new ArgumentNullException(nameof(nuspec));
             }
 
-            if (getPackageReader == null)
-            {
-                throw new ArgumentNullException(nameof(getPackageReader));
-            }
-
             Identity = identity;
             Path = path;
             LastWriteTimeUtc = lastWriteTimeUtc;
             _nuspecHelper = nuspec;
-            _getPackageReader = getPackageReader;
         }
 
         protected LocalPackageInfo()
@@ -80,7 +82,7 @@ namespace NuGet.Protocol
         /// <remarks>This creates a new instance each time. Callers need to dispose of it.</remarks>
         public virtual PackageReaderBase GetReader()
         {
-            return _getPackageReader();
+            return new PackageArchiveReader(Path);
         }
 
         /// <summary>
