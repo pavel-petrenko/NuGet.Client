@@ -70,6 +70,9 @@ namespace NuGet.Protocol
         [JsonIgnore]
         public Uri PackageDetailsUrl { get; set; }
 
+        //TODO: JsonIgnore or ???
+        public string PackagePath { get; private set; }
+
         [JsonProperty(PropertyName = JsonProperties.RequireLicenseAcceptance, DefaultValueHandling = DefaultValueHandling.Populate)]
         [DefaultValue(false)]
         [JsonConverter(typeof(SafeBoolConverter))]
@@ -157,7 +160,7 @@ namespace NuGet.Protocol
                 }
                 else
                 {
-                    // We can't parse it, add an error 
+                    // We can't parse it, add an error
                     if (errors == null)
                     {
                         errors = new List<string>();

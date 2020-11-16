@@ -10,16 +10,48 @@ namespace NuGet.Protocol
     public class LocalPackageInfo
     {
         private readonly Lazy<NuspecReader> _nuspecHelper;
+        private readonly Func<PackageReaderBase> _getPackageReader;
 
-        [Obsolete("Please move to ")]
+        /// <summary>
+        /// Local nuget package.
+        /// </summary>
+        /// <param name="identity">Package id and version.</param>
+        /// <param name="path">Path to the nupkg.</param>
+        /// <param name="lastWriteTimeUtc">Last nupkg write time for publish date.</param>
+        /// <param name="nuspec">Nuspec XML.</param>
+        /// <param name="getPackageReader">Method to retrieve the package as a reader.</param>
         public LocalPackageInfo(
             PackageIdentity identity,
             string path,
             DateTime lastWriteTimeUtc,
             Lazy<NuspecReader> nuspec,
-            Func<PackageReaderBase> getPackageReader) : this(identity, path, lastWriteTimeUtc, nuspec)
+            Func<PackageReaderBase> getPackageReader)
         {
-            // TODO: becompat.    
+            if (identity == null)
+            {
+                throw new ArgumentNullException(nameof(identity));
+            }
+
+            if (path == null)
+            {
+                throw new ArgumentNullException(nameof(path));
+            }
+
+            if (nuspec == null)
+            {
+                throw new ArgumentNullException(nameof(nuspec));
+            }
+
+            if (getPackageReader == null)
+            {
+                throw new ArgumentNullException(nameof(getPackageReader));
+            }
+
+            Identity = identity;
+            Path = path;
+            LastWriteTimeUtc = lastWriteTimeUtc;
+            _nuspecHelper = nuspec;
+            _getPackageReader = getPackageReader;
         }
 
         /// <summary>
@@ -29,11 +61,13 @@ namespace NuGet.Protocol
         /// <param name="path">Path to the nupkg.</param>
         /// <param name="lastWriteTimeUtc">Last nupkg write time for publish date.</param>
         /// <param name="nuspec">Nuspec XML.</param>
+        /// <param name="useFolder">Read content from folder next to nupkg.</param>
         public LocalPackageInfo(
-        PackageIdentity identity,
-        string path,
-        DateTime lastWriteTimeUtc,
-        Lazy<NuspecReader> nuspec)
+            PackageIdentity identity,
+            string path,
+            DateTime lastWriteTimeUtc,
+            Lazy<NuspecReader> nuspec,
+            bool useFolder)
         {
             if (identity == null)
             {
@@ -54,6 +88,18 @@ namespace NuGet.Protocol
             Path = path;
             LastWriteTimeUtc = lastWriteTimeUtc;
             _nuspecHelper = nuspec;
+            UseFolder = useFolder;
+            _getPackageReader = new Func<PackageReaderBase>(() =>
+            {
+                if (UseFolder)
+                {
+                    return new PackageFolderReader(Path);
+                }
+                else
+                {
+                    return new PackageArchiveReader(Path);
+                }
+            });
         }
 
         protected LocalPackageInfo()
@@ -72,6 +118,11 @@ namespace NuGet.Protocol
         public virtual string Path { get; }
 
         /// <summary>
+        /// Read contents from folder.
+        /// </summary>
+        public virtual bool UseFolder { get; }
+
+        /// <summary>
         /// Last file write time. This is used for the publish date.
         /// </summary>
         public virtual DateTime LastWriteTimeUtc { get; }
@@ -82,7 +133,7 @@ namespace NuGet.Protocol
         /// <remarks>This creates a new instance each time. Callers need to dispose of it.</remarks>
         public virtual PackageReaderBase GetReader()
         {
-            return new PackageArchiveReader(Path);
+            return _getPackageReader();
         }
 
         /// <summary>
@@ -103,5 +154,6 @@ namespace NuGet.Protocol
                 return Path.EndsWith(PackagingCoreConstants.NupkgExtension, StringComparison.OrdinalIgnoreCase);
             }
         }
+
     }
 }

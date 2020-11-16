@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using MessagePack;
 using MessagePack.Formatters;
+using NuGet.Common;
 using NuGet.Packaging;
 using NuGet.Packaging.Core;
 
@@ -23,6 +24,7 @@ namespace NuGet.VisualStudio.Internal.Contracts
         private const string LicenseUrlPropertyName = "licenseurl";
         private const string OwnersPropertyName = "owners";
         private const string ProjectUrlPropertyName = "projecturl";
+        private const string PackagePathPropertyName = "packagepath";
         private const string PublishedPropertyName = "published";
         private const string ReportAbuseUrlPropertyName = "reportabuseurl";
         private const string PackageDetailsUrlPropertyName = "packagedetailsurl";
@@ -56,6 +58,7 @@ namespace NuGet.VisualStudio.Internal.Contracts
             DateTimeOffset? published = null;
             Uri? reportAbuseUrl = null;
             Uri? packageDetailsUrl = null;
+            string? packagePath = null;
             bool requireLicenseAcceptance = false;
             string? summary = null;
             bool prefixReserved = false;
@@ -106,6 +109,9 @@ namespace NuGet.VisualStudio.Internal.Contracts
                         {
                             projectUrl = options.Resolver.GetFormatter<Uri>().Deserialize(ref reader, options);
                         }
+                        break;
+                    case PackagePathPropertyName:
+                        packagePath = reader.ReadString();
                         break;
                     case PublishedPropertyName:
                         if (!reader.TryReadNil())
@@ -189,6 +195,7 @@ namespace NuGet.VisualStudio.Internal.Contracts
                 Published = published,
                 ReportAbuseUrl = reportAbuseUrl,
                 PackageDetailsUrl = packageDetailsUrl,
+                PackagePath = packagePath,
                 RequireLicenseAcceptance = requireLicenseAcceptance,
                 Summary = summary,
                 PrefixReserved = prefixReserved,
@@ -287,6 +294,10 @@ namespace NuGet.VisualStudio.Internal.Contracts
             {
                 options.Resolver.GetFormatter<Uri>().Serialize(ref writer, value.PackageDetailsUrl, options);
             }
+
+            //TODO: right way to add new props to a value serializer?
+            writer.Write(PackagePathPropertyName);
+            writer.Write(value.PackagePath);
 
             writer.Write(RequireLicenseAcceptancePropertyName);
             writer.Write(value.RequireLicenseAcceptance);

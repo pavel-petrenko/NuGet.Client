@@ -457,7 +457,8 @@ namespace NuGet.Protocol
                             identity,
                             nupkgInfo.FullName,
                             nupkgInfo.LastWriteTimeUtc,
-                            new Lazy<NuspecReader>(() => reader)
+                            new Lazy<NuspecReader>(() => reader),
+                            useFolder: false
                         );
 
                         result.Add(cachePackage);

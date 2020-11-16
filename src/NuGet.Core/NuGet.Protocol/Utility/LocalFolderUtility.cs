@@ -632,7 +632,8 @@ namespace NuGet.Protocol
                 new PackageIdentity(identity.Id, identity.Version),
                 nupkgPath,
                 File.GetLastWriteTimeUtc(nupkgPath),
-                nuspecHelper
+                nuspecHelper,
+                useFolder: false
             );
         }
 
@@ -1101,7 +1102,8 @@ namespace NuGet.Protocol
                         nuspec.GetIdentity(),
                         nupkgFile.FullName,
                         nupkgFile.LastWriteTimeUtc,
-                        nuspecHelper
+                        nuspecHelper,
+                        useFolder: false
                     );
                 }
             }

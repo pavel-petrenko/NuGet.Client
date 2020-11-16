@@ -61,6 +61,7 @@ namespace NuGet.VisualStudio.Internal.Contracts
                 Published = packageSearchMetadata.Published,
                 ReportAbuseUrl = packageSearchMetadata.ReportAbuseUrl,
                 PackageDetailsUrl = packageSearchMetadata.PackageDetailsUrl,
+                PackagePath = packageSearchMetadata.PackagePath,
                 RequireLicenseAcceptance = packageSearchMetadata.RequireLicenseAcceptance,
                 Summary = packageSearchMetadata.Summary,
                 PrefixReserved = packageSearchMetadata.PrefixReserved,

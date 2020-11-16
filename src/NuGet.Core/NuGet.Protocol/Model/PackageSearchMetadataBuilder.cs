@@ -40,6 +40,7 @@ namespace NuGet.Protocol.Core.Types
             public DateTimeOffset? Published { get; set; }
             public Uri ReportAbuseUrl { get; set; }
             public Uri PackageDetailsUrl { get; set; }
+            public string PackagePath { get; set; }
             public bool RequireLicenseAcceptance { get; set; }
             public string Summary { get; set; }
             public string Tags { get; set; }
