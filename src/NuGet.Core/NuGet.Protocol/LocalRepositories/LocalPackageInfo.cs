@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
+using NuGet.Common;
 using NuGet.Packaging;
 using NuGet.Packaging.Core;
 
@@ -93,7 +94,9 @@ namespace NuGet.Protocol
             {
                 if (UseFolder)
                 {
-                    return new PackageFolderReader(Path);
+                    //TODO: cut .nupkg from file name and use it as directory peer name. (or should we fix Path to be passed in properly)
+                    var directoryName = Path.Substring(0, Path.Length - 6);
+                    return new PackageFolderReader(directoryName);
                 }
                 else
                 {
