@@ -157,6 +157,5 @@ namespace NuGet.Protocol
                 return Path.EndsWith(PackagingCoreConstants.NupkgExtension, StringComparison.OrdinalIgnoreCase);
             }
         }
-
     }
 }
