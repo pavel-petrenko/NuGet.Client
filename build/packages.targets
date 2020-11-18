@@ -66,8 +66,8 @@
         <PackageReference Update="Newtonsoft.Json" Version="$(NewtonsoftJsonPackageVersion)" />
         <PackageReference Update="System.Collections.Immutable" Version="1.7.1" />
         <PackageReference Update="System.Diagnostics.Debug" Version="$(SystemPackagesVersion)" />
-        <PackageReference Update="System.Security.Cryptography.Pkcs" Version="$(PatchedSystemPackagesVersion)" />
         <PackageReference Update="System.Security.Cryptography.Cng" Version="$(PatchedSystemPackagesVersion)" />
+        <PackageReference Update="System.Security.Cryptography.Pkcs" Version="$(PatchedSystemPackagesVersion)" />
         <PackageReference Update="System.Security.Cryptography.ProtectedData" Version="4.4.0" />
         <PackageReference Update="System.Threading.Tasks.Dataflow" Version="4.9.0" />
         <PackageReference Update="VSLangProj" Version="7.0.3300" />
@@ -79,21 +79,19 @@
 
     <!-- Test and utility packages -->
     <ItemGroup>
-        <!--<PackageReference Update="EnvDTE" Version="8.0.1" />-->
         <PackageReference Update="FluentAssertions" Version="4.19.4" />
         <PackageReference Update="Microsoft.Build.Runtime" Version="$(MicrosoftBuildPackageVersion)" />
-        <PackageReference Update="Microsoft.CSharp" Version="$(SystemPackagesVersion)" />
         <PackageReference Update="Microsoft.CodeAnalysis" Version="3.0.0" />
         <PackageReference Update="Microsoft.CodeAnalysis.Build.Tasks" Version="3.0.0-dev-61717-03" />
         <PackageReference Update="Microsoft.CodeAnalysis.CSharp" Version="3.0.0-dev-61717-03" />
         <PackageReference Update="Microsoft.CodeAnalysis.PublicApiAnalyzers" Version="3.0.0" />
-        <PackageReference Update="Microsoft.NET.Test.Sdk" Version="15.5.0" />
+        <PackageReference Update="Microsoft.CSharp" Version="$(SystemPackagesVersion)" />
         <PackageReference Update="Microsoft.Net.Compilers.netcore" Version="3.0.0-dev-61717-03" />
+        <PackageReference Update="Microsoft.NET.Test.Sdk" Version="15.5.0" />
         <PackageReference Update="Microsoft.PowerShell.3.ReferenceAssemblies" Version="1.0.0" />
         <PackageReference Update="Microsoft.Test.Apex.VisualStudio" Version="16.3.29131.53-pre" />
         <PackageReference Update="Microsoft.VisualStudio.ProjectSystem" Version="15.0.751" PrivateAssets="All" />
         <PackageReference Update="Microsoft.VisualStudio.Sdk.TestFramework" Version="16.5.4-beta" />
-        <!--<PackageReference Update="Microsoft.VisualStudio.Shell.Interop.15.0.DesignTime" Version="$(VSComponentsVersion)" />-->
         <PackageReference Update="Moq" Version="4.14.5" />
         <PackageReference Update="NuGet.Core" Version="2.14.0-rtm-832" />
         <PackageReference Update="Portable.BouncyCastle" Version="1.8.1.3" />
