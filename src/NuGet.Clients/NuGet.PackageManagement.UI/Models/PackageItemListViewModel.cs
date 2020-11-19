@@ -669,8 +669,8 @@ namespace NuGet.PackageManagement.UI
                 {
                     IReadOnlyCollection<VersionInfoContextInfo> packageVersions = await GetVersionsAsync();
 
-                        // filter package versions based on allowed versions in packages.config
-                        packageVersions = packageVersions.Where(v => AllowedVersions.Satisfies(v.Version)).ToList();
+                    // filter package versions based on allowed versions in packages.config
+                    packageVersions = packageVersions.Where(v => AllowedVersions.Satisfies(v.Version)).ToList();
                     var latestAvailableVersion = packageVersions
                         .Select(p => p.Version)
                         .MaxOrDefault();
