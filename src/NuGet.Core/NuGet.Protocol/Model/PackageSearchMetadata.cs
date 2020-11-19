@@ -70,7 +70,7 @@ namespace NuGet.Protocol
         [JsonIgnore]
         public Uri PackageDetailsUrl { get; set; }
 
-        //TODO: JsonIgnore or ???
+        [JsonIgnore]
         public string PackagePath { get; private set; }
 
         [JsonProperty(PropertyName = JsonProperties.RequireLicenseAcceptance, DefaultValueHandling = DefaultValueHandling.Populate)]

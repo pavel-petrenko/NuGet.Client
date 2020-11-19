@@ -534,11 +534,9 @@ namespace NuGet.PackageManagement.UI
 
             Assumes.NotNull(IconUrl);
 
-            Stream stream = await RemoteFileService.GetRemoteFileAsync(IconUrl, CancellationToken.None);
-
-            if (stream != null)
+            using (Stream stream = await RemoteFileService.GetRemoteFileAsync(IconUrl, CancellationToken.None))
             {
-                using (stream)
+                if (stream != null)
                 {
                     var iconBitmapImage = new BitmapImage();
                     iconBitmapImage.BeginInit();
@@ -557,22 +555,22 @@ namespace NuGet.PackageManagement.UI
                         BitmapStatus = IconBitmapStatus.DefaultIconDueToDecodingError;
                     }
                 }
-            }
-            else
-            {
-                ErrorFloodGate.ReportBadNetworkError();
-                if (BitmapStatus == IconBitmapStatus.Fetching)
+                else
                 {
-                    BitmapStatus = IconBitmapStatus.DefaultIconDueToNullStream;
+                    ErrorFloodGate.ReportBadNetworkError();
+                    if (BitmapStatus == IconBitmapStatus.Fetching)
+                    {
+                        BitmapStatus = IconBitmapStatus.DefaultIconDueToNullStream;
+                    }
                 }
-            }
 
-            ErrorFloodGate.ReportAttempt();
+                ErrorFloodGate.ReportAttempt();
 
-            if (IconBitmap != null)
-            {
-                string cacheKey = GenerateKeyFromIconUri(IconUrl);
-                AddToCache(cacheKey, IconBitmap);
+                if (IconBitmap != null)
+                {
+                    string cacheKey = GenerateKeyFromIconUri(IconUrl);
+                    AddToCache(cacheKey, IconBitmap);
+                }
             }
         }
 
@@ -671,8 +669,8 @@ namespace NuGet.PackageManagement.UI
                 {
                     IReadOnlyCollection<VersionInfoContextInfo> packageVersions = await GetVersionsAsync();
 
-                    // filter package versions based on allowed versions in packages.config
-                    packageVersions = packageVersions.Where(v => AllowedVersions.Satisfies(v.Version)).ToList();
+                        // filter package versions based on allowed versions in packages.config
+                        packageVersions = packageVersions.Where(v => AllowedVersions.Satisfies(v.Version)).ToList();
                     var latestAvailableVersion = packageVersions
                         .Select(p => p.Version)
                         .MaxOrDefault();

@@ -4,11 +4,18 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Documents;
+using Microsoft.ServiceHub.Framework;
 using NuGet.Packaging;
 using NuGet.Packaging.Licenses;
 using NuGet.Protocol;
 using NuGet.Protocol.Core.Types;
+using NuGet.VisualStudio;
+using NuGet.VisualStudio.Common;
+using NuGet.VisualStudio.Internal.Contracts;
 
 namespace NuGet.PackageManagement.UI
 {
@@ -144,6 +151,28 @@ namespace NuGet.PackageManagement.UI
                 default:
                     break;
             }
+        }
+
+        public static async Task<string> GetEmbeddedLicenseAsync(Uri embeddedFileUri)
+        {
+            string content = null;
+
+            IServiceBrokerProvider serviceBrokerProvider = await ServiceLocator.GetInstanceAsync<IServiceBrokerProvider>();
+            IServiceBroker serviceBroker = await serviceBrokerProvider.GetAsync();
+
+            using (INuGetRemoteFileService remoteFileService = await serviceBroker.GetProxyAsync<INuGetRemoteFileService>(NuGetServices.RemoteFileService))
+            using (Stream stream = await remoteFileService.GetRemoteFileAsync(embeddedFileUri, CancellationToken.None))
+            {
+                if (stream != null)
+                {
+                    using (var reader = new StreamReader(stream))
+                    {
+                        content = reader.ReadToEnd();
+                    }
+                }
+            }
+
+            return content;
         }
     }
 }

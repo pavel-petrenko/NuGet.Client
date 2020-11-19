@@ -35,7 +35,6 @@ namespace NuGet.PackageManagement.UI
         {
             if (DataContext is DetailedPackageMetadata metadata)
             {
-
                 var window = new LicenseFileWindow()
                 {
                     DataContext = new LicenseFileData
@@ -47,21 +46,8 @@ namespace NuGet.PackageManagement.UI
 
                 NuGetUIThreadHelper.JoinableTaskFactory.RunAsync(async () =>
                 {
-                    IServiceBrokerProvider serviceBrokerProvider = await ServiceLocator.GetInstanceAsync<IServiceBrokerProvider>();
-                    IServiceBroker serviceBroker = await serviceBrokerProvider.GetAsync();
-
-                    //TODO: should we make this service idisposable?
-#pragma warning disable ISB001 // Dispose of proxies
-                    INuGetRemoteFileService remoteFileService = await serviceBroker.GetProxyAsync<INuGetRemoteFileService>(NuGetServices.RemoteFileService);
-#pragma warning restore ISB001 // Dispose of proxies
-
-                    Stream stream = await remoteFileService.GetRemoteFileAsync(new Uri(metadata.PackagePath + "#" + metadata.LicenseMetadata.License), CancellationToken.None);
-                    string content = null;
-                    if (stream != null)
-                    {
-                        StreamReader reader = new StreamReader(stream);
-                        content = reader.ReadToEnd();
-                    }
+                    var embeddedFileUri =  new Uri(metadata.PackagePath + "#" + metadata.LicenseMetadata.License);
+                    string content = await PackageLicenseUtilities.GetEmbeddedLicenseAsync(embeddedFileUri);
 
                     var flowDoc = new FlowDocument();
                     flowDoc.Blocks.AddRange(PackageLicenseUtilities.GenerateParagraphs(content));

@@ -54,10 +54,11 @@ namespace NuGet.PackageManagement.VisualStudio
                     Uri.UnescapeDataString(uri.Fragment)
                         .Substring(1)); // Substring skips the '#' in the URI fragment
 
-                    //TODO: protect against zip slip attack
-                    string extractedIconPath = Path.Combine(Path.GetDirectoryName(packagePath), fileRelativePath);
+                    string dirPath = Path.GetDirectoryName(packagePath);
+                    string extractedIconPath = Path.Combine(dirPath, fileRelativePath);
 
-                    if (File.Exists(extractedIconPath))
+                    // use GetFullPath to normalize "..", so that zip slip attack cannot allow a user to walk up the file directory
+                    if (Path.GetFullPath(extractedIconPath).StartsWith(dirPath, StringComparison.OrdinalIgnoreCase) && File.Exists(extractedIconPath))
                     {
                         Stream fileStream = new FileStream(extractedIconPath, FileMode.Open);
                         return fileStream;
@@ -165,25 +166,15 @@ namespace NuGet.PackageManagement.VisualStudio
             {
                 if (disposing)
                 {
-                    // TODO: dispose managed state (managed objects)
+                    _authorizationServiceClient?.Dispose();
                 }
 
-                // TODO: free unmanaged resources (unmanaged objects) and override finalizer
-                // TODO: set large fields to null
                 _disposedValue = true;
             }
         }
 
-        // // TODO: override finalizer only if 'Dispose(bool disposing)' has code to free unmanaged resources
-        // ~NuGetRemoteFileService()
-        // {
-        //     // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-        //     Dispose(disposing: false);
-        // }
-
         public void Dispose()
         {
-            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
             Dispose(disposing: true);
             GC.SuppressFinalize(this);
         }
