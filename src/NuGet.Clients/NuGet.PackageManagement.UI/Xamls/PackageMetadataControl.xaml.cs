@@ -46,8 +46,7 @@ namespace NuGet.PackageManagement.UI
 
                 NuGetUIThreadHelper.JoinableTaskFactory.RunAsync(async () =>
                 {
-                    var embeddedFileUri = new Uri(metadata.PackagePath + "#" + metadata.LicenseMetadata.License);
-                    string content = await PackageLicenseUtilities.GetEmbeddedLicenseAsync(embeddedFileUri);
+                    string content = await PackageLicenseUtilities.GetEmbeddedLicenseAsync(new Packaging.Core.PackageIdentity(metadata.Id, metadata.Version), CancellationToken.None);
 
                     var flowDoc = new FlowDocument();
                     flowDoc.Blocks.AddRange(PackageLicenseUtilities.GenerateParagraphs(content));

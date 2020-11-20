@@ -7,6 +7,7 @@ using System.IO;
 using System.Threading;
 using System.Windows.Documents;
 using Microsoft.ServiceHub.Framework;
+using NuGet.Packaging.Core;
 using NuGet.VisualStudio;
 using NuGet.VisualStudio.Common;
 using NuGet.VisualStudio.Internal.Contracts;
@@ -32,7 +33,7 @@ namespace NuGet.PackageManagement.UI
             _licenseFileLocation = licenseFileLocation;
         }
 
-        internal void LoadLicenseFile()
+        internal void LoadLicenseFile(PackageIdentity packageIdentity)
         {
             if (Interlocked.CompareExchange(ref _initialized, 1, 0) == 0)
             {
@@ -44,7 +45,7 @@ namespace NuGet.PackageManagement.UI
                         IServiceBroker serviceBroker = await serviceBrokerProvider.GetAsync();
 
                         var embeddedFileUri = new Uri(_packagePath + "#" + _licenseFileLocation);
-                        string content = await PackageLicenseUtilities.GetEmbeddedLicenseAsync(embeddedFileUri);
+                        string content = await PackageLicenseUtilities.GetEmbeddedLicenseAsync(packageIdentity, CancellationToken.None);
 
                         var flowDoc = new FlowDocument();
                         flowDoc.Blocks.AddRange(PackageLicenseUtilities.GenerateParagraphs(content));

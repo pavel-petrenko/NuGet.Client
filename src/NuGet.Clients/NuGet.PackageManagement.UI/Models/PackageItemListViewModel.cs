@@ -20,6 +20,7 @@ using Microsoft.VisualStudio.Threading;
 using NuGet.Common;
 using NuGet.PackageManagement.VisualStudio;
 using NuGet.Packaging;
+using NuGet.Packaging.Core;
 using NuGet.Versioning;
 using NuGet.VisualStudio;
 using NuGet.VisualStudio.Internal.Contracts;
@@ -534,7 +535,7 @@ namespace NuGet.PackageManagement.UI
 
             Assumes.NotNull(IconUrl);
 
-            using (Stream stream = await RemoteFileService.GetRemoteFileAsync(IconUrl, CancellationToken.None))
+            using (Stream stream = await RemoteFileService.GetPackageIconAsync(new PackageIdentity(Id, Version), CancellationToken.None))
             {
                 if (stream != null)
                 {

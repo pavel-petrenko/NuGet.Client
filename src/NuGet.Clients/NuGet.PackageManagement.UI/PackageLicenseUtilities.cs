@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using System.Windows.Documents;
 using Microsoft.ServiceHub.Framework;
 using NuGet.Packaging;
+using NuGet.Packaging.Core;
 using NuGet.Packaging.Licenses;
 using NuGet.Protocol;
 using NuGet.Protocol.Core.Types;
@@ -153,7 +154,7 @@ namespace NuGet.PackageManagement.UI
             }
         }
 
-        public static async Task<string> GetEmbeddedLicenseAsync(Uri embeddedFileUri)
+        public static async Task<string> GetEmbeddedLicenseAsync(PackageIdentity packageIdentity, CancellationToken cancellationToken)
         {
             string content = null;
 
@@ -161,7 +162,7 @@ namespace NuGet.PackageManagement.UI
             IServiceBroker serviceBroker = await serviceBrokerProvider.GetAsync();
 
             using (INuGetRemoteFileService remoteFileService = await serviceBroker.GetProxyAsync<INuGetRemoteFileService>(NuGetServices.RemoteFileService))
-            using (Stream stream = await remoteFileService.GetRemoteFileAsync(embeddedFileUri, CancellationToken.None))
+            using (Stream stream = await remoteFileService.GetEmbeddedLicenseAsync(packageIdentity, CancellationToken.None))
             {
                 if (stream != null)
                 {

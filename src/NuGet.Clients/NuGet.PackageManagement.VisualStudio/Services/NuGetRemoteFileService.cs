@@ -4,9 +4,12 @@
 #nullable enable
 
 using System;
+using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Diagnostics;
 using System.IO;
 using System.Net.Http;
+using System.Runtime.Caching;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft;
@@ -14,6 +17,8 @@ using Microsoft.ServiceHub.Framework;
 using Microsoft.ServiceHub.Framework.Services;
 using NuGet.Common;
 using NuGet.Packaging;
+using NuGet.Packaging.Core;
+using NuGet.Protocol;
 using NuGet.VisualStudio.Internal.Contracts;
 
 namespace NuGet.PackageManagement.VisualStudio
@@ -24,6 +29,36 @@ namespace NuGet.PackageManagement.VisualStudio
         private IServiceBroker _serviceBroker;
         private AuthorizationServiceClient? _authorizationServiceClient;
         private bool _disposedValue;
+
+        // TODO: right settings for cache and policy?
+        internal readonly static MemoryCache IdentityToUriCache = new MemoryCache("PackageSearchMetadata",
+            new NameValueCollection
+            {
+                { "cacheMemoryLimitMegabytes", "4" },
+                { "physicalMemoryLimitPercentage", "0" },
+                { "pollingInterval", "00:02:00" }
+            });
+        private static readonly CacheItemPolicy CacheItemPolicy = new CacheItemPolicy
+        {
+            SlidingExpiration = ObjectCache.NoSlidingExpiration,
+            AbsoluteExpiration = ObjectCache.InfiniteAbsoluteExpiration,
+        };
+
+        public static void AddIconToCache(PackageIdentity packageIdentity, Uri uri)
+        {
+            if (uri != null)
+            {
+                IdentityToUriCache.Add("icon:" + packageIdentity.ToString(), uri, CacheItemPolicy);
+            }
+        }
+
+        public static void AddLicenseToCache(PackageIdentity packageIdentity, Uri uri)
+        {
+            if (uri != null)
+            {
+                IdentityToUriCache.Add("license:" + packageIdentity.ToString(), uri, CacheItemPolicy);
+            }
+        }
 
         public NuGetRemoteFileService(
             ServiceActivationOptions options,
@@ -43,54 +78,85 @@ namespace NuGet.PackageManagement.VisualStudio
             _serviceBroker = serviceBroker;
             Assumes.NotNull(_serviceBroker);
         }
-        public async ValueTask<Stream?> GetRemoteFileAsync(Uri uri, CancellationToken cancellationToken)
+
+        public async ValueTask<Stream?> GetPackageIconAsync(PackageIdentity packageIdentity, CancellationToken cancellationToken)
         {
+            Assumes.NotNull(packageIdentity);
+            string key = "icon:" + packageIdentity.ToString();
+            Uri? uri = IdentityToUriCache.Get(key) as Uri;
+
+            if (uri == null)
+            {
+                return null;
+            }
+
+            Stream? stream;
             if (IsEmbeddedUri(uri))
             {
-                string packagePath = uri.LocalPath;
-                if (File.Exists(packagePath))
+                stream = await GetEmbeddedFileAsync(uri, cancellationToken);
+            }
+            else
+            {
+                stream = await GetStream(uri);
+            }
+
+            return stream;
+        }
+
+        public async ValueTask<Stream?> GetEmbeddedLicenseAsync(PackageIdentity packageIdentity, CancellationToken cancellationToken)
+        {
+            Assumes.NotNull(packageIdentity);
+            string key = "license:" + packageIdentity.ToString();
+            Uri? uri = IdentityToUriCache.Get(key) as Uri;
+            if (uri == null)
+            {
+                return null;
+            }
+
+            Stream? stream = await GetEmbeddedFileAsync(uri, cancellationToken);
+            return stream;
+        }
+
+        private async ValueTask<Stream?> GetEmbeddedFileAsync(Uri uri, CancellationToken cancellationToken)
+        {
+            string packagePath = uri.LocalPath;
+            if (File.Exists(packagePath))
+            {
+                string fileRelativePath = PathUtility.StripLeadingDirectorySeparators(
+                Uri.UnescapeDataString(uri.Fragment)
+                    .Substring(1)); // Substring skips the '#' in the URI fragment
+
+                string dirPath = Path.GetDirectoryName(packagePath);
+                string extractedIconPath = Path.Combine(dirPath, fileRelativePath);
+
+                // use GetFullPath to normalize "..", so that zip slip attack cannot allow a user to walk up the file directory
+                if (Path.GetFullPath(extractedIconPath).StartsWith(dirPath, StringComparison.OrdinalIgnoreCase) && File.Exists(extractedIconPath))
                 {
-                    string fileRelativePath = PathUtility.StripLeadingDirectorySeparators(
-                    Uri.UnescapeDataString(uri.Fragment)
-                        .Substring(1)); // Substring skips the '#' in the URI fragment
-
-                    string dirPath = Path.GetDirectoryName(packagePath);
-                    string extractedIconPath = Path.Combine(dirPath, fileRelativePath);
-
-                    // use GetFullPath to normalize "..", so that zip slip attack cannot allow a user to walk up the file directory
-                    if (Path.GetFullPath(extractedIconPath).StartsWith(dirPath, StringComparison.OrdinalIgnoreCase) && File.Exists(extractedIconPath))
-                    {
-                        Stream fileStream = new FileStream(extractedIconPath, FileMode.Open);
-                        return fileStream;
-                    }
-                    else
-                    {
-                        try
-                        {
-                            using (PackageArchiveReader reader = new PackageArchiveReader(packagePath))
-                            using (Stream parStream = await reader.GetStreamAsync(fileRelativePath, cancellationToken))
-                            {
-                                var memoryStream = new MemoryStream();
-                                await parStream.CopyToAsync(memoryStream);
-                                return memoryStream;
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            Debug.WriteLine(ex);
-                            return null;
-                        }
-                    }
+                    Stream fileStream = new FileStream(extractedIconPath, FileMode.Open);
+                    return fileStream;
                 }
                 else
                 {
-                    return null;
+                    try
+                    {
+                        using (PackageArchiveReader reader = new PackageArchiveReader(packagePath))
+                        using (Stream parStream = await reader.GetStreamAsync(fileRelativePath, cancellationToken))
+                        {
+                            var memoryStream = new MemoryStream();
+                            await parStream.CopyToAsync(memoryStream);
+                            return memoryStream;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine(ex);
+                        return null;
+                    }
                 }
             }
             else
             {
-                Stream? stream = await GetStream(uri);
-                return stream;
+                return null;
             }
         }
 

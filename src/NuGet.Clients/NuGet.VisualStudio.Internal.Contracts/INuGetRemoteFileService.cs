@@ -7,11 +7,13 @@ using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using NuGet.Packaging.Core;
 
 namespace NuGet.VisualStudio.Internal.Contracts
 {
     public interface INuGetRemoteFileService : IDisposable
     {
-        ValueTask<Stream?> GetRemoteFileAsync(Uri uri, CancellationToken cancellationToken);
+        ValueTask<Stream?> GetPackageIconAsync(PackageIdentity packageIdentity, CancellationToken cancellationToken);
+        ValueTask<Stream?> GetEmbeddedLicenseAsync(PackageIdentity packageIdentity, CancellationToken cancellationToken);
     }
 }
