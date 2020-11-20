@@ -14,7 +14,9 @@ using Microsoft.VisualStudio.Sdk.TestFramework;
 using Moq;
 using NuGet.PackageManagement.VisualStudio;
 using NuGet.Packaging;
+using NuGet.Packaging.Core;
 using NuGet.Test.Utility;
+using NuGet.Versioning;
 using NuGet.VisualStudio.Internal.Contracts;
 using Test.Utility.Threading;
 using Xunit;
@@ -70,6 +72,8 @@ namespace NuGet.PackageManagement.UI.Test
 
             var packageItemListViewModel = new PackageItemListViewModel()
             {
+                Id = "PackageId.IconUrl_WithMalformedUrlScheme_ReturnsDefaultInitallyAndFinally",
+                Version = new NuGetVersion("1.0.0"),
                 IconUrl = iconUrl,
                 RemoteFileService = _remoteFileService,
             };
@@ -90,6 +94,8 @@ namespace NuGet.PackageManagement.UI.Test
 
             var packageItemListViewModel = new PackageItemListViewModel()
             {
+                Id = "PackageId.IconUrl_WhenFileNotFound_ReturnsDefault",
+                Version = new NuGetVersion("1.0.0"),
                 IconUrl = iconUrl,
                 RemoteFileService = _remoteFileService,
             };
@@ -107,6 +113,8 @@ namespace NuGet.PackageManagement.UI.Test
             var iconUrl = new Uri("resources/testpackageicon.png", UriKind.Relative);
             var packageItemListViewModel = new PackageItemListViewModel()
             {
+                Id = "PackageId.IconUrl_RelativeUri_ReturnsDefault",
+                Version = new NuGetVersion("1.0.0"),
                 IconUrl = iconUrl,
                 RemoteFileService = _remoteFileService,
             };
@@ -138,6 +146,8 @@ namespace NuGet.PackageManagement.UI.Test
 
                 var packageItemListViewModel = new PackageItemListViewModel()
                 {
+                    Id = "PackageId.IconUrl_WithLocalPathAndColorProfile_LoadsImage",
+                    Version = new NuGetVersion("1.0.0"),
                     IconUrl = new Uri(grayiccImagePath, UriKind.Absolute),
                     RemoteFileService = _remoteFileService,
                 };
@@ -158,6 +168,8 @@ namespace NuGet.PackageManagement.UI.Test
 
             var packageItemListViewModel = new PackageItemListViewModel()
             {
+                Id = "PackageId.IconUrl_WithValidImageUrl_FailsDownloadsImage_ReturnsDefault",
+                Version = new NuGetVersion("1.0.0"),
                 IconUrl = iconUrl,
                 RemoteFileService = _remoteFileService,
             };
@@ -198,6 +210,8 @@ namespace NuGet.PackageManagement.UI.Test
 
                 var packageItemListViewModel = new PackageItemListViewModel()
                 {
+                    Id = "PackageId.IconUrl_EmbeddedIcon_HappyPath_LoadsImage",
+                    Version = new NuGetVersion("1.0.0"),
                     IconUrl = builder.Uri,
                     PackagePath = zipPath,
                     RemoteFileService = _remoteFileService,
@@ -225,9 +239,10 @@ namespace NuGet.PackageManagement.UI.Test
             {
                 var imagePath = Path.Combine(testDir, "image.png");
                 CreateNoisePngImage(path: imagePath);
-
                 var packageItemListViewModel = new PackageItemListViewModel()
                 {
+                    Id = "PackageId.IconUrl_FileUri_LoadsImage",
+                    Version = new NuGetVersion("1.0.0"),
                     IconUrl = new Uri(imagePath, UriKind.Absolute),
                     RemoteFileService = _remoteFileService,
                 };
@@ -260,6 +275,8 @@ namespace NuGet.PackageManagement.UI.Test
 
                 var packageItemListViewModel = new PackageItemListViewModel()
                 {
+                    Id = "PackageId.IconUrl_EmbeddedIcon_RelativeParentPath_ReturnsDefault",
+                    Version = new NuGetVersion("1.0.0"),
                     IconUrl = builder.Uri,
                     PackagePath = zipPath,
                     RemoteFileService = _remoteFileService,
@@ -326,6 +343,9 @@ namespace NuGet.PackageManagement.UI.Test
         /// </summary>
         private static async Task<BitmapSource> GetFinalIconBitmapAsync(PackageItemListViewModel packageItemListViewModel)
         {
+            var packageIdentity = new PackageIdentity(packageItemListViewModel.Id, packageItemListViewModel.Version);
+            NuGetRemoteFileService.AddIconToCache(packageIdentity, packageItemListViewModel.IconUrl);
+
             BitmapSource result = packageItemListViewModel.IconBitmap;
             int millisecondsToWait = 3000;
             while (!IconBitmapStatusUtility.GetIsCompleted(packageItemListViewModel.BitmapStatus) && millisecondsToWait >= 0)
@@ -367,6 +387,8 @@ namespace NuGet.PackageManagement.UI.Test
 
                 var packageItemListViewModel = new PackageItemListViewModel()
                 {
+                    Id = "PackageId.IconUrl_FileUri_LoadsImage",
+                    Version = new NuGetVersion("1.0.0"),
                     IconUrl = builder.Uri,
                     PackagePath = zipPath,
                     RemoteFileService = _remoteFileService,
