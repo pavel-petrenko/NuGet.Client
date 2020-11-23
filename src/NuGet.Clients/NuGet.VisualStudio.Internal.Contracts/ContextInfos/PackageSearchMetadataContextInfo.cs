@@ -54,6 +54,7 @@ namespace NuGet.VisualStudio.Internal.Contracts
                 Tags = packageSearchMetadata.Tags,
                 Identity = packageSearchMetadata.Identity,
                 LicenseUrl = packageSearchMetadata.LicenseUrl,
+                LicenseMetadata = packageSearchMetadata.LicenseMetadata,
                 IsRecommended = isRecommended,
                 RecommenderVersion = recommenderVersion,
                 Owners = packageSearchMetadata.Owners,
