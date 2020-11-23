@@ -387,7 +387,7 @@ namespace NuGet.PackageManagement.UI.Test
 
                 var packageItemListViewModel = new PackageItemListViewModel()
                 {
-                    Id = "PackageId.IconUrl_FileUri_LoadsImage",
+                    Id = "PackageId.IconUrl_FileUri_LoadsImage" + iconElement,
                     Version = new NuGetVersion("1.0.0"),
                     IconUrl = builder.Uri,
                     PackagePath = zipPath,
