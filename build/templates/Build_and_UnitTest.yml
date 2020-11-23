@@ -405,6 +405,14 @@ steps:
     ArtifactType: "Container"
   condition: "and(succeeded(),eq(variables['BuildRTM'], 'false'))"
 
+- task: PublishBuildArtifacts@1
+  displayName: "Publish artifacts"
+  inputs:
+    PathtoPublish: "$(Build.Repository.LocalPath)\\artifacts"
+    ArtifactName: "artifacts-folder"
+    ArtifactType: "Container"
+  condition: "failed()"
+
 - task: CopyFiles@2
   displayName: "Copy LCG Files"
   inputs:
