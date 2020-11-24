@@ -52,12 +52,10 @@ namespace NuGet.PackageManagement.VisualStudio
             }
         }
 
-        public static void AddLicenseToCache(PackageIdentity packageIdentity, Uri uri)
+        public static void AddLicenseToCache(PackageIdentity packageIdentity, Uri embeddedLicenseUri)
         {
-            if (uri != null)
-            {
-                IdentityToUriCache.Add("license:" + packageIdentity.ToString(), uri, CacheItemPolicy);
-            }
+            Assumes.NotNull(embeddedLicenseUri);
+            IdentityToUriCache.Add("license:" + packageIdentity.ToString(), embeddedLicenseUri, CacheItemPolicy);
         }
 
         public NuGetRemoteFileService(

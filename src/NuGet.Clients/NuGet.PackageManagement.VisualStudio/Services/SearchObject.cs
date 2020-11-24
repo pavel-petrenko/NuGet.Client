@@ -234,8 +234,42 @@ namespace NuGet.PackageManagement.VisualStudio
                 memoryCacheItem.UpdateSearchMetadata(packageSearchMetadata);
             }
 
+            Assumes.NotNull(packageSearchMetadata);
             NuGetRemoteFileService.AddIconToCache(packageSearchMetadata.Identity, packageSearchMetadata.IconUrl);
-            NuGetRemoteFileService.AddLicenseToCache(packageSearchMetadata.Identity, packageSearchMetadata.IconUrl);
+            if (packageSearchMetadata.LicenseMetadata?.Type == LicenseType.File && packageSearchMetadata.LicenseMetadata?.License != null)
+            {
+                NuGetRemoteFileService.AddLicenseToCache(
+                    packageSearchMetadata.Identity,
+                    CreateEmbeddedLicenseUri(packageSearchMetadata));
+            }
+        }
+
+        private static Uri CreateEmbeddedLicenseUri(IPackageSearchMetadata packageSearchMetadata)
+        {
+            Assumes.NotNull(packageSearchMetadata);
+            Uri? baseUri = Convert(packageSearchMetadata.PackagePath);
+
+            UriBuilder builder = new UriBuilder(baseUri)
+            {
+                Fragment = packageSearchMetadata.LicenseMetadata.License
+            };
+
+            return builder.Uri;
+        }
+
+        /// <summary>
+        /// Convert a string to a URI safely. This will return null if there are errors.
+        /// </summary>
+        private static Uri? Convert(string uri)
+        {
+            Uri? fullUri = null;
+
+            if (!string.IsNullOrEmpty(uri))
+            {
+                Uri.TryCreate(uri, UriKind.Absolute, out fullUri);
+            }
+
+            return fullUri;
         }
     }
 }
