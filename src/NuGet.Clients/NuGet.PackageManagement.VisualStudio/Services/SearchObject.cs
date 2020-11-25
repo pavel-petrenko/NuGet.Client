@@ -14,8 +14,10 @@ using Microsoft;
 using Microsoft.VisualStudio.Threading;
 using NuGet.Common;
 using NuGet.Packaging;
+using NuGet.Protocol;
 using NuGet.Protocol.Core.Types;
 using NuGet.VisualStudio.Internal.Contracts;
+using static NuGet.Protocol.Core.Types.PackageSearchMetadataBuilder;
 
 namespace NuGet.PackageManagement.VisualStudio
 {
@@ -236,22 +238,30 @@ namespace NuGet.PackageManagement.VisualStudio
 
             Assumes.NotNull(packageSearchMetadata);
             NuGetRemoteFileService.AddIconToCache(packageSearchMetadata.Identity, packageSearchMetadata.IconUrl);
-            if (packageSearchMetadata.LicenseMetadata?.Type == LicenseType.File && packageSearchMetadata.LicenseMetadata?.License != null)
+
+            string? packagePath = (packageSearchMetadata as LocalPackageSearchMetadata)?.PackagePath ??
+                    (packageSearchMetadata as ClonedPackageSearchMetadata)?.PackagePath;
+
+            if (packagePath != null)
             {
-                NuGetRemoteFileService.AddLicenseToCache(
-                    packageSearchMetadata.Identity,
-                    CreateEmbeddedLicenseUri(packageSearchMetadata));
+                LicenseMetadata? licenseMetadata = (packageSearchMetadata as LocalPackageSearchMetadata)?.LicenseMetadata ??
+                    (packageSearchMetadata as ClonedPackageSearchMetadata)?.LicenseMetadata;
+                if (licenseMetadata != null)
+                {
+                    NuGetRemoteFileService.AddLicenseToCache(
+                        packageSearchMetadata.Identity,
+                        CreateEmbeddedLicenseUri(packagePath, licenseMetadata));
+                }
             }
         }
 
-        private static Uri CreateEmbeddedLicenseUri(IPackageSearchMetadata packageSearchMetadata)
+        private static Uri CreateEmbeddedLicenseUri(string packagePath, LicenseMetadata licenseMetadata)
         {
-            Assumes.NotNull(packageSearchMetadata);
-            Uri? baseUri = Convert(packageSearchMetadata.PackagePath);
+            Uri? baseUri = Convert(packagePath);
 
             UriBuilder builder = new UriBuilder(baseUri)
             {
-                Fragment = packageSearchMetadata.LicenseMetadata.License
+                Fragment = licenseMetadata.License
             };
 
             return builder.Uri;

@@ -103,7 +103,6 @@ namespace NuGet.Protocol
         public Uri ReportAbuseUrl { get; private set; }
 
         public Uri PackageDetailsUrl { get; private set; }
-        public string PackagePath { get; private set; }
 
         public bool RequireLicenseAcceptance { get; private set; }
 

@@ -70,9 +70,6 @@ namespace NuGet.Protocol
         [JsonIgnore]
         public Uri PackageDetailsUrl { get; set; }
 
-        [JsonIgnore]
-        public string PackagePath { get; private set; }
-
         [JsonProperty(PropertyName = JsonProperties.RequireLicenseAcceptance, DefaultValueHandling = DefaultValueHandling.Populate)]
         [DefaultValue(false)]
         [JsonConverter(typeof(SafeBoolConverter))]
